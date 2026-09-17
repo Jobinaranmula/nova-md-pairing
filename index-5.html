@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NOVA MD | WhatsApp Bot</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:Arial,Helvetica,sans-serif;
+  background:#020b08;
+  color:#fff;
+  min-height:100vh;
+}
+header{
+  height:86px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 5%;
+  background:rgba(3,14,11,.96);
+  border-bottom:1px solid #0b6b4b;
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+.logo{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  font-size:30px;
+  font-weight:800;
+}
+.logo img{
+  width:64px;
+  height:64px;
+  border-radius:50%;
+  object-fit:cover;
+  border:2px solid #19f58b;
+  box-shadow:0 0 18px #19f58b99;
+}
+.logo span{color:#19f58b}
+nav{display:flex;gap:28px}
+nav a{color:#e8f5ef;text-decoration:none;font-size:15px}
+nav a:hover{color:#19f58b}
+
+.hero{
+  min-height:500px;
+  display:grid;
+  grid-template-columns:1fr 1.15fr;
+  align-items:center;
+  gap:30px;
+  padding:45px 6%;
+  background:
+    radial-gradient(circle at 20% 50%,#075437aa,transparent 38%),
+    radial-gradient(circle at 75% 45%,#063f2aaa,transparent 42%),
+    linear-gradient(135deg,#02120d,#031d14 50%,#020b08);
+}
+.hero-logo{
+  width:min(390px,80vw);
+  aspect-ratio:1;
+  object-fit:cover;
+  border-radius:50%;
+  display:block;
+  margin:auto;
+  border:3px solid #19f58b;
+  box-shadow:0 0 35px #19f58b66;
+}
+.hero-text{text-align:left}
+.hero h1{font-size:clamp(48px,7vw,88px);letter-spacing:2px}
+.hero h1 span{color:#19f58b}
+.hero p{font-size:25px;color:#aebdb7;margin:14px 0 24px}
+.badges{display:flex;gap:12px;flex-wrap:wrap}
+.badge{
+  border:1px solid #19f58b;
+  color:#19f58b;
+  border-radius:30px;
+  padding:11px 18px;
+}
+.tagline{
+  color:#19f58b;
+  font-size:25px;
+  line-height:1.25;
+  margin-top:28px;
+  font-style:italic;
+}
+
+.container{width:92%;max-width:1200px;margin:auto}
+.cards{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:22px;
+  margin:28px auto 40px;
+}
+.card{
+  background:linear-gradient(145deg,#062019,#03130e);
+  border:1px solid #0b6b4b;
+  border-radius:20px;
+  padding:30px;
+  box-shadow:0 12px 35px #0008;
+}
+.icon{
+  width:56px;height:56px;
+  display:grid;place-items:center;
+  border-radius:15px;
+  background:#19e978;
+  color:#04120d;
+  font-size:27px;
+  margin-bottom:20px;
+}
+.card h2{font-size:25px;margin-bottom:12px}
+.card p{color:#aebdb7;line-height:1.65;font-size:16px}
+input{
+  width:100%;
+  margin-top:18px;
+  padding:16px;
+  border-radius:11px;
+  border:1px solid #236d54;
+  background:#020c09;
+  color:#fff;
+  font-size:16px;
+  outline:none;
+}
+button{
+  width:100%;
+  margin-top:14px;
+  padding:16px;
+  border:0;
+  border-radius:11px;
+  background:#19e978;
+  color:#03120c;
+  font-weight:800;
+  font-size:16px;
+}
+.code{
+  margin-top:20px;
+  padding:24px 10px;
+  border:1px dashed #19e978;
+  border-radius:12px;
+  text-align:center;
+  color:#19e978;
+  font-size:28px;
+  font-weight:800;
+  letter-spacing:5px;
+}
+.status{text-align:center;margin-top:16px;color:#9eb0a8}
+.steps{list-style:none;margin-top:8px}
+.steps li{
+  margin:14px 0;
+  padding-left:42px;
+  position:relative;
+  color:#d5e1dc;
+  line-height:1.5;
+}
+.steps li:before{
+  content:counter(item);
+  counter-increment:item;
+  position:absolute;left:0;top:0;
+  width:30px;height:30px;
+  border:1px solid #19e978;
+  border-radius:50%;
+  display:grid;place-items:center;
+  color:#19e978;
+}
+.steps{counter-reset:item}
+.info{text-align:center;margin-bottom:40px}
+.info strong{color:#19e978}
+footer{
+  border-top:1px solid #0b6b4b;
+  text-align:center;
+  padding:30px;
+  color:#82958d;
+}
+@media(max-width:850px){
+  header{height:74px;padding:0 18px}
+  .logo{font-size:21px;gap:9px}
+  .logo img{width:50px;height:50px}
+  nav{display:none}
+  .hero{
+    grid-template-columns:1fr;
+    text-align:center;
+    padding:35px 20px 45px;
+  }
+  .hero-logo{width:min(330px,78vw)}
+  .hero-text{text-align:center}
+  .hero p{font-size:20px}
+  .tagline{font-size:21px}
+  .badges{justify-content:center}
+  .cards{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <img src="file_00000006a40821192f262b034ce79bc.png" alt="NOVA MD Logo">
+    NOVA <span>MD</span>
+  </div>
+  <nav>
+    <a href="#home">Home</a>
+    <a href="#pair">Pair WhatsApp</a>
+    <a href="#help">Help</a>
+    <a href="#info">Bot Info</a>
+  </nav>
+</header>
+
+<section class="hero" id="home">
+  <img class="hero-logo" src="file_00000006a40821192f262b034ce79bc.png" alt="NOVA MD Full Logo">
+  <div class="hero-text">
+    <h1>NOVA <span>MD</span></h1>
+    <p>Your Smart WhatsApp Bot</p>
+    <div class="badges">
+      <div class="badge">⚡ Fast</div>
+      <div class="badge">🛡 Secure</div>
+      <div class="badge">● Online</div>
+    </div>
+    <div class="tagline">More Than a Bot<br>A Real Helper</div>
+  </div>
+</section>
+
+<main class="container">
+  <div class="cards">
+
+    <section class="card" id="pair">
+      <div class="icon">🔗</div>
+      <h2>Pair Your WhatsApp</h2>
+      <p>Enter your WhatsApp number to request a pairing code.</p>
+      <input id="phone" type="tel" placeholder="WhatsApp Number">
+      <button onclick="generateCode()">🔑 Generate Pairing Code</button>
+      <p class="status">We never ask for your OTP or password.</p>
+    </section>
+
+    <section class="card">
+      <div class="icon">🔐</div>
+      <h2>Your Pairing Code</h2>
+      <p>Your real code will appear here after the NOVA MD backend is connected.</p>
+      <div class="code" id="code">---- ----</div>
+      <button onclick="copyCode()">📋 Copy Code</button>
+      <div class="status" id="status">Waiting for connection...</div>
+    </section>
+
+    <section class="card" id="help">
+      <div class="icon">📖</div>
+      <h2>How to Connect?</h2>
+      <ol class="steps">
+        <li>Open WhatsApp</li>
+        <li>Go to Linked Devices</li>
+        <li>Select “Link with phone number instead”</li>
+        <li>Enter the pairing code</li>
+      </ol>
+    </section>
+
+  </div>
+
+  <section class="card info" id="info">
+    <h2>🤖 NOVA MD</h2>
+    <p>WhatsApp Bot<br><br>
+      Developer: <strong>Jobin Skariah</strong><br>
+      Bot: <strong>NOVA MD</strong>
+    </p>
+  </section>
+</main>
+
+<footer>
+  © 2026 NOVA MD · WhatsApp Bot<br>
+  Developer: Jobin Skariah
+</footer>
+
+<script>
+function generateCode(){
+  document.getElementById("status").innerText =
+    "Backend connection required to generate a real WhatsApp pairing code.";
+}
+function copyCode(){
+  const code=document.getElementById("code").innerText.trim();
+  if(code !== "---- ----"){
+    navigator.clipboard.writeText(code);
+    document.getElementById("status").innerText="Code copied!";
+  }
+}
+</script>
+</body>
+</html>
