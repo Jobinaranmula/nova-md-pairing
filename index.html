@@ -134,4 +134,146 @@ button{
   color:#20e879;
 }
 .status{
-  margin-top:15
+  margin-top:15px;
+text-align:center;
+color:#8faaa0;
+font-size:14px;
+}
+.steps{
+  margin-top:15px;
+  padding-left:20px;
+  color:#c5d0cc;
+  line-height:2;
+}
+.info{
+  margin:30px 0;
+  text-align:center;
+}
+.info strong{color:#20e879}
+footer{
+  margin-top:45px;
+  padding:30px;
+  text-align:center;
+  border-top:1px solid #164b38;
+  color:#83968f;
+}
+@media(max-width:800px){
+  header{padding:0 20px}
+  nav{display:none}
+  .hero h1{font-size:42px}
+  .cards{grid-template-columns:1fr}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">🤖</div>
+    NOVA <span>MD</span>
+  </div>
+
+  <nav>
+    <a href="#home">Home</a>
+    <a href="#pair">Pair WhatsApp</a>
+    <a href="#help">Help</a>
+    <a href="#info">Bot Info</a>
+  </nav>
+</header>
+
+<section class="hero" id="home">
+  <h1>NOVA <span>MD</span></h1>
+  <p>Your Smart WhatsApp Bot</p>
+
+  <div class="badges">
+    <div class="badge">⚡ Fast</div>
+    <div class="badge">🛡 Secure</div>
+    <div class="badge">● Online</div>
+  </div>
+</section>
+
+<main class="container">
+
+<div class="cards">
+
+<section class="card" id="pair">
+  <div class="icon">🔗</div>
+  <h2>Pair Your WhatsApp</h2>
+  <p>Enter your WhatsApp number to request a pairing code.</p>
+
+  <input id="phone" type="tel" placeholder="WhatsApp Number">
+
+  <button onclick="generateCode()">
+    🔑 Generate Pairing Code
+  </button>
+
+  <p class="status">
+    We never ask for your OTP or password.
+  </p>
+</section>
+
+<section class="card">
+  <div class="icon">🔐</div>
+  <h2>Your Pairing Code</h2>
+  <p>When the NOVA MD backend is connected, your real code will appear here.</p>
+
+  <div class="code" id="code">
+    ---- ----
+  </div>
+
+  <button onclick="copyCode()">📋 Copy Code</button>
+
+  <div class="status" id="status">
+    Waiting for connection...
+  </div>
+</section>
+
+<section class="card" id="help">
+  <div class="icon">📖</div>
+  <h2>How to Connect?</h2>
+
+  <ol class="steps">
+    <li>Open WhatsApp</li>
+    <li>Go to Linked Devices</li>
+    <li>Select “Link with phone number instead”</li>
+    <li>Enter the pairing code</li>
+  </ol>
+</section>
+
+</div>
+
+<section class="card info" id="info">
+  <h2>🤖 NOVA MD</h2>
+  <p>
+    WhatsApp Bot<br><br>
+    Developer: <strong>Jobin Skariah</strong><br>
+    Bot: <strong>NOVA MD</strong>
+  </p>
+</section>
+
+</main>
+
+<footer>
+  © 2026 NOVA MD · WhatsApp Bot<br>
+  Developer: Jobin Skariah
+</footer>
+
+<script>
+function generateCode(){
+  document.getElementById("status").innerText =
+    "Backend connection required to generate a real WhatsApp pairing code.";
+}
+
+function copyCode(){
+  const code=document.getElementById("code").innerText.trim();
+
+  if(code !== "---- ----"){
+    navigator.clipboard.writeText(code);
+    document.getElementById("status").innerText="Code copied!";
+  }
+}
+</script>
+
+</body>
+</html>
