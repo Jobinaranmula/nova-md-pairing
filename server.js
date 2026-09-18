@@ -20,14 +20,12 @@ let sock = null;
 let authState = null;
 let saveCreds = null;
 let connectionStatus = "starting";
-let connecting = false;
+let pairingInProgress = false;
 
 async function startWhatsApp() {
-  if (connecting) return;
-
-  connecting = true;
-
   try {
+    console.log("🚀 Starting NOVA MD WhatsApp...");
+
     const auth = await useMultiFileAuthState("./session");
 
     authState = auth.state;
@@ -36,8 +34,7 @@ async function startWhatsApp() {
     sock = makeWASocket({
       auth: authState,
       logger: P({ level: "silent" }),
-      printQRInTerminal: false,
-      browser: ["NOVA MD", "Chrome", "1.0.0"]
+      printQRInTerminal: false
     });
 
     sock.ev.on("creds.update", saveCreds);
@@ -47,30 +44,25 @@ async function startWhatsApp() {
 
       console.log("WhatsApp connection:", connection);
 
-      if (connection === "connecting") {
-        connectionStatus = "connecting";
-      }
-
       if (connection === "open") {
-        connectionStatus = "open";
-        connecting = false;
+        connectionStatus = "connected";
         console.log("✅ NOVA MD connected to WhatsApp");
       }
 
       if (connection === "close") {
-        connectionStatus = "closed";
-        connecting = false;
+        connectionStatus = "disconnected";
 
         const statusCode =
           lastDisconnect?.error?.output?.statusCode;
 
+        console.log("❌ WhatsApp disconnected:", statusCode);
+
         if (statusCode !== DisconnectReason.loggedOut) {
-          console.log("🔄 Reconnecting...");
-          sock = null;
+          console.log("🔄 Reconnecting in 5 seconds...");
 
           setTimeout(() => {
             startWhatsApp();
-          }, 3000);
+          }, 5000);
         } else {
           console.log("❌ WhatsApp logged out");
           sock = null;
@@ -78,62 +70,64 @@ async function startWhatsApp() {
       }
     });
 
-    connecting = false;
+  } catch (error) {
+    console.error("❌ WhatsApp startup error:", error);
 
-  } catch (err) {
-    console.error("❌ WhatsApp startup error:", err);
-
-    sock = null;
-    connecting = false;
     connectionStatus = "error";
 
-    setTimeout(startWhatsApp, 5000);
+    setTimeout(() => {
+      startWhatsApp();
+    }, 5000);
   }
 }
 
 
-// ===============================
+// ================================
 // PAIRING CODE
-// ===============================
+// ================================
 
 app.post("/pair", async (req, res) => {
   try {
     let number = String(req.body.number || "")
       .replace(/\D/g, "");
 
-    console.log("📱 Pairing request:", number);
+    console.log("📱 Pair request:", number);
 
     if (!number) {
       return res.status(400).json({
         success: false,
-        error: "Enter WhatsApp number with country code."
+        error: "Enter WhatsApp number with country code"
       });
     }
 
-    if (!sock) {
+    if (!sock || !authState) {
       return res.status(503).json({
         success: false,
-        error: "WhatsApp socket is not ready yet. Try again in a few seconds."
-      });
-    }
-
-    if (!authState) {
-      return res.status(503).json({
-        success: false,
-        error: "Authentication state is not ready."
+        error: "WhatsApp is still starting. Wait a few seconds and try again."
       });
     }
 
     if (authState.creds.registered) {
       return res.status(400).json({
         success: false,
-        error: "This WhatsApp session is already paired."
+        error: "WhatsApp is already paired."
       });
     }
 
-    console.log("🔑 Requesting WhatsApp pairing code...");
+    if (pairingInProgress) {
+      return res.status(429).json({
+        success: false,
+        error: "Pairing request already in progress. Please wait."
+      });
+    }
+
+    pairingInProgress = true;
+
+    console.log("🔑 Requesting pairing code...");
 
     const code = await sock.requestPairingCode(number);
+
+    pairingInProgress = false;
 
     console.log("✅ Pairing code generated:", code);
 
@@ -142,54 +136,48 @@ app.post("/pair", async (req, res) => {
       code: code
     });
 
-  } catch (err) {
+  } catch (error) {
 
-    console.error(
-      "❌ Pairing error:",
-      err?.message || err
-    );
+    pairingInProgress = false;
+
+    console.error("❌ Pairing error:", error);
 
     return res.status(500).json({
       success: false,
-      error: err?.message || "Pairing code generation failed."
+      error: error?.message || "Failed to generate pairing code"
     });
   }
 });
 
 
-// ===============================
+// ================================
 // STATUS
-// ===============================
+// ================================
 
 app.get("/status", (req, res) => {
   res.json({
-    online: !!sock,
-    connection: connectionStatus,
-    paired: !!authState?.creds?.registered
+    online: connectionStatus === "connected",
+    connected: connectionStatus === "connected",
+    paired: !!authState?.creds?.registered,
+    status: connectionStatus
   });
 });
 
 
-// ===============================
+// ================================
 // HOME
-// ===============================
+// ================================
 
-app.get("/health", (req, res) => {
-  res.json({
-    status: "online",
-    service: "NOVA MD Pairing",
-    whatsapp: connectionStatus
-  });
+app.get("/", (req, res) => {
+  res.sendFile(__dirname + "/index.html");
 });
 
 
-// ===============================
+// ================================
 // START SERVER
-// ===============================
+// ================================
 
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`🚀 NOVA MD server running on port ${PORT}`);
-  console.log(`🌐 Port: ${PORT}`);
-
+  console.log(`🌐 NOVA MD server running on port ${PORT}`);
   startWhatsApp();
 });
