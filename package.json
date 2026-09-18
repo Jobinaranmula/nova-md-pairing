@@ -1,1 +1,11 @@
-
+{
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@whiskeysockets/baileys": "latest",
+    "cors": "latest",
+    "express": "latest",
+    "pino": "latest"
+  }
+}
