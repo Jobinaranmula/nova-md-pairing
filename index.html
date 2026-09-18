@@ -269,11 +269,46 @@ footer{
 </footer>
 
 <script>
-function generateCode(){
-  document.getElementById("status").innerText =
-    "Backend connection required to generate a real WhatsApp pairing code.";
-}
+async function generateCode() {
+  const phone = document.getElementById("phone").value.trim();
+  const codeBox = document.getElementById("code");
+  const status = document.getElementById("status");
 
+  if (!phone) {
+    status.innerText = "Enter your WhatsApp number with country code.";
+    return;
+  }
+
+  codeBox.innerText = "Loading...";
+  status.innerText = "Requesting pairing code...";
+
+  try {
+    const response = await fetch("/pair", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        number: phone
+      })
+    });
+
+    const data = await response.json();
+
+    if (data.success && data.code) {
+      codeBox.innerText = data.code;
+      status.innerText = "Pairing code generated successfully.";
+    } else {
+      codeBox.innerText = "---- ----";
+      status.innerText = data.error || "Failed to generate pairing code.";
+    }
+
+  } catch (error) {
+    codeBox.innerText = "---- ----";
+    status.innerText = "Server connection failed.";
+    console.error(error);
+  }
+      }
 function copyCode(){
   const code=document.getElementById("code").innerText.trim();
 
